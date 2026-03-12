@@ -1,0 +1,28 @@
+name: Build Musicpy Editor
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+        name: Checkout Code
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.8.10"
+      - name: Install pip
+        run: |
+          pip install musicpy pyglet==1.5.11 yapf PyQt5==5.15.2 pyinstaller
+      - name: Package Software
+        run: |
+          pyinstaller --onefile --add-data "visualization/packages/languages/en/language_patch.py;visualization/packages/languages/en/" --add-data "visualization/packages/languages/cn/language_patch.py;visualization/packages/languages/cn/" --add-data "visualization/packages/change_settings.py;visualization/packages/" --add-data "visualization/packages/browse.py;visualization/packages/" --add-data "languages/中文.json;languages" --add-data "languages/English.json;languages" --add-data "visualization/packages/piano_config.json;visualization/packages" --add-data "config.json;." --add-data "visualization/resources/piano_background.png;visualization/resources" --add-data "visualization/resources/piano.ico;visualization/resources" --add-data "visualization/resources/white.png;visualization/resources" "musicpy editor.pyw"
+      - name: Upload Dist
+        uses: actions/upload-artifact@v6
+        with:
+          name: MyPackage
+          path: dist
